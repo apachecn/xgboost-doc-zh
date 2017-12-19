@@ -11,9 +11,12 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul id="navbar" class="navbar navbar-left">
         <li> <a href="{{url_root}}">XGBoost</a> </li>
-        {% for name in ['开始使用', '学习教程', 'How To'] %}
+        <!-- {% for name in ['Get Started', 'Tutorials', 'How To'] %}
         <li> <a href="{{url_root}}{{name.lower()|replace(" ", "_")}}/index.html">{{name}}</a> </li>
-        {% endfor %}
+        {% endfor %} -->
+        <li> <a href="{{url_root}}get_started/index.html">开始使用</a> </li>
+        <li> <a href="{{url_root}}tutorials/index.html">学习教程</a> </li>
+        <li> <a href="{{url_root}}how_to/index.html">如何去</a> </li>
         {% for name in ['Packages'] %}
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">{{name}} <span class="caret"></span></a>

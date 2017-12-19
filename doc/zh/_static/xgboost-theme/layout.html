@@ -89,7 +89,7 @@
     {{ metatags }}
     {%- block htmltitle %}
     {%- if pagename != 'index' %}
-    <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
+    <title>{{ title|striptags|e }}{{ titlesuffix|replace("documentation", "中文文档")}} - ApacheCN</title>
     {%- else %}
     <title>XGBoost 中文文档 - ApacheCN</title>
     {%- endif %}
