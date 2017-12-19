@@ -11,7 +11,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul id="navbar" class="navbar navbar-left">
         <li> <a href="{{url_root}}">XGBoost</a> </li>
-        {% for name in ['Get Started', 'Tutorials', 'How To'] %}
+        {% for name in ['开始使用', '学习教程', 'How To'] %}
         <li> <a href="{{url_root}}{{name.lower()|replace(" ", "_")}}/index.html">{{name}}</a> </li>
         {% endfor %}
         {% for name in ['Packages'] %}
