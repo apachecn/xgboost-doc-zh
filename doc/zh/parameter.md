@@ -1,4 +1,4 @@
-XGBoost Parameters
+XGBoost 参数
 ==================
 Before running XGboost, we must set three types of parameters: general parameters, booster parameters and task parameters.
 - General parameters relates to which booster we are using to do boosting, commonly tree or linear model
@@ -6,11 +6,11 @@ Before running XGboost, we must set three types of parameters: general parameter
 - Learning Task parameters that decides on the learning scenario, for example, regression tasks may use different parameters with ranking tasks.
 - Command line parameters that relates to behavior of CLI version of xgboost.
 
-Parameters in R Package
+R 软件包中的参数
 -----------------------
 In R-package, you can use .(dot) to replace under score in the parameters, for example, you can use max.depth as max_depth. The underscore parameters are also valid in R.
 
-General Parameters
+普通参数
 ------------------
 * booster [default=gbtree]
   - which booster to use, can be gbtree, gblinear or dart. gbtree and dart use tree based model while gblinear uses linear function.
@@ -23,7 +23,7 @@ General Parameters
 * num_feature [set automatically by xgboost, no need to be set by user]
   - feature dimension used in boosting, set to maximum dimension of the feature
 
-Parameters for Tree Booster
+用于 Tree Booster 的参数
 ---------------------------
 * eta [default=0.3]
   - step size shrinkage used in update to prevents overfitting. After each boosting step, we can directly get the weights of new features. and eta actually shrinks the feature weights to make the boosting process more conservative.
@@ -74,7 +74,7 @@ Parameters for Tree Booster
 * scale_pos_weight, [default=0]
   - Control the balance of positive and negative weights, useful for unbalanced classes. A typical value to consider: sum(negative  cases) / sum(positive cases) See [Parameters Tuning](how_to/param_tuning.md) for more discussion. Also see Higgs Kaggle competition demo for examples: [R](../demo/kaggle-higgs/higgs-train.R ), [py1](../demo/kaggle-higgs/higgs-numpy.py ), [py2](../demo/kaggle-higgs/higgs-cv.py ), [py3](../demo/guide-python/cross_validation.py)
 
-Additional parameters for Dart Booster
+用于 Dart Booster 的其它参数
 --------------------------------------
 * sample_type [default="uniform"]
   - type of sampling algorithm.
@@ -96,7 +96,7 @@ Additional parameters for Dart Booster
     - If a dropout is skipped, new trees are added in the same manner as gbtree.
   - range: [0.0, 1.0]
 
-Parameters for Linear Booster
+用于 Linear Booster 的参数
 -----------------------------
 * lambda [default=0]
   - L2 regularization term on weights, increase this value will make model more conservative.
@@ -105,7 +105,7 @@ Parameters for Linear Booster
 * lambda_bias
   - L2 regularization term on bias, default 0(no L1 reg on bias because it is not important)
 
-Learning Task Parameters
+学习任务的参数
 ------------------------
 Specify the learning task and the corresponding learning objective. The objective options are below:
 * objective [ default=reg:linear ]
@@ -142,7 +142,7 @@ training repeatively
 * seed [ default=0 ]
  - random number seed.
 
-Command Line Parameters
+命令行参数
 -----------------------
 The following parameters are only used in the console version of xgboost
 * use_buffer [ default=1 ]
