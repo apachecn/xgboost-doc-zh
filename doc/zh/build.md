@@ -1,110 +1,111 @@
-Installation Guide
+安装指南
 ==================
 
-This page gives instructions on how to build and install the xgboost package from
-scratch on various systems. It consists of two steps:
+该页面提供了有关如何在各种操作系统上构建和安装 xgboost 软件包的说明.
+由如下两个步骤组成:
 
-1. First build the shared library from the C++ codes (`libxgboost.so` for linux/osx and `libxgboost.dll` for windows).
-   - Exception: for R-package installation please directly refer to the R package section.
-2. Then install the language packages (e.g. Python Package).
+1. 首先, 从 C++ 代码中构建共享库（针对 linux/osx 的是 `libxgboost.so` 然后针对 windows 的是 `libxgboost.dll`).
+   - Exception: 针对 R 软件包的安装请直接参考 R 软件包的部分.
+2. 然后, 安装相关的编程语言软件包（例如. Python 软件包）.
 
-***Important*** the newest version of xgboost uses submodule to maintain packages. So when you clone the repo, remember to use the recursive option as follows.
+***Important*** 最新版本的 xgboost 使用子模块来维护软件包, 所以当你 clone repo 时, 记得按如下方式使用递归选项.
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
 ```
-For windows users who use github tools, you can open the git shell, and type the following command.
+
+针对使用 github 工具的 windows 用户, 可以打开 git shell, 然后输入以下命令.
 ```bash
 git submodule init
 git submodule update
 ```
 
-Please refer to [Trouble Shooting Section](#trouble-shooting) first if you had any problem
-during installation. If the instructions do not work for you, please feel free
-to ask questions at [xgboost/issues](https://github.com/dmlc/xgboost/issues), or
-even better to send pull request if you can fix the problem.
+如果你在安装期间有任何问题, 请首先参考 [故障排除部分](#trouble-shooting).
+如果其中的说明不适合你, 请放心的到 [xgboost/issues](https://github.com/dmlc/xgboost/issues) 上提问题,
+或者如果你能解决该问题, 最好发起一个 pull request.
 
-## Contents
-- [Build the Shared Library](#build-the-shared-library)
-  - [Building on Ubuntu/Debian](#building-on-ubuntu-debian)
-  - [Building on OSX](#building-on-osx)
-  - [Building on Windows](#building-on-windows)
-  - [Customized Building](#customized-building)
-- [Python Package Installation](#python-package-installation)
-- [R Package Installation](#r-package-installation)
-- [Trouble Shooting](#trouble-shooting)
+## 页面内容目录
+- [构建共享库](#构建共享库)
+  - [在 Ubuntu/Debian 上构建](#在 Ubuntu/Debian 上构建)
+  - [在 OSX 上构建](#在 OSX 上构建)
+  - [在 Windows 上构建](#在 Windows 上构建)
+  - [自定义构建](#自定义构建)
+- [Python 软件包安装](#Python 软件包安装)
+- [R 软件包安装](#R 软件包安装)
+- [故障排查](#故障排查)
 
-## Build the Shared Library
+## 构建共享库
 
-Our goal is to build the shared library:
-- On Linux/OSX the target library is ```libxgboost.so```
-- On Windows the target library is ```libxgboost.dll```
+我们的目标是构建共享库:
+- 在 Linux/OSX 上的目标库是 ```libxgboost.so```
+- 在 Windows 上的目标库是 ```libxgboost.dll```
 
-The minimal building requirement is
+最小的构建要求是
 
-- A recent c++ compiler supporting C++ 11 (g++-4.6 or higher)
+- 最新的支持 C++ 11 的 c++ 编译器（g++-4.6 or higher）
 
-We can edit `make/config.mk` to change the compile options, and then build by
-`make`. If everything goes well, we can go to the specific language installation section.
+我们可以编辑 `make/config.mk` 以改变编译选项, 然后通过 `make` 命令来构建.
+如果一切顺利, 我们可以去特定的编程语言安装部分.
 
-### Building on Ubuntu/Debian
+### 在 Ubuntu/Debian 上构建
 
-On Ubuntu, one builds xgboost by
+在 Ubuntu 上, 构建 xgboost 的命令如下
 
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
 cd xgboost; make -j4
 ```
 
-### Building on OSX
+### 在 OSX 上构建
 
-On OSX, one builds xgboost by
+在 OSX 上, 构建 xgboost 的命令如下
 
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
 cd xgboost; cp make/minimum.mk ./config.mk; make -j4
 ```
 
-This builds xgboost without multi-threading, because by default clang in OSX does not come with open-mp.
-See the following paragraph for OpenMP enabled xgboost.
+这样就可以在不使用多线程的情况下构建 xgboost 了, 因为默认情况下, OSX 中的 clang 不会带有 open-mp.
+有关启用 OpenMP 的 xgboost, 请参阅以下段落.
 
-
-Here is the complete solution to use OpenMP-enabled compilers to install XGBoost.
-Obtain gcc-5.x.x with openmp support by `brew install gcc --without-multilib`. (`brew` is the de facto standard of `apt-get` on OS X. So installing [HPC](http://hpc.sourceforge.net/) separately is not recommended, but it should work.)
+以下是使用 OpenMP 的编译器来安装 XGBoost 的完整解决方案.
+通过命令 `brew install gcc --without-multilib` 获得 gcc-5.x.x 与 openmap 的支持.
+（brew 是 OSX 上 `apt-get` 的标准组件. 因此不建议单独安装 [HPC](http://hpc.sourceforge.net/), 但是它应该也是可用的.）
 
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
 cd xgboost; cp make/config.mk ./config.mk; make -j4
 ```
 
-### Building on Windows
-You need to first clone the xgboost repo with recursive option clone the submodules.
-If you are using github tools, you can open the git-shell, and type the following command.
-We recommend using [Git for Windows](https://git-for-windows.github.io/)
-because it brings a standard bash shell. This will highly ease the installation process.
+### 在 Windows 上构建
+
+您在 clone repo 时需要首先使用递归选项来 clone 子模块.
+如果使用的是 github 工具, 可以打开 github-shell, 然后输入以下命令.
+我们推荐使用 [Windows 版本的 Git](https://git-for-windows.github.io/), 因为它自带了一个标准的 bash shell.
+将极大地简化安装过程.
 
 ```bash
 git submodule init
 git submodule update
 ```
 
-XGBoost support both build by MSVC or MinGW. Here is how you can build xgboost library using MinGW.
+XGBoost 支持由 MSVC 或 MinGW 来构建. 以下是你如何使用 MinGW 构建 xgboost 库的说明.
 
-After installing [Git for Windows](https://git-for-windows.github.io/), you should have a shortcut `Git Bash`.
-All the following steps are in the `Git Bash`.
+在安装完 [Windows 版本的 Git](https://git-for-windows.github.io/) 之后, 应该有一个 `Git Bash` 的快捷方式.
+以下所有的步骤都可以在 `Git Bash` 中进行.
 
-In MinGW, `make` command comes with the name `mingw32-make`. You can add the following line into the `.bashrc` file.
+在 MinGW 中, `make` 命令是 `mingw32-make` 这个名字. 你可以添加下面的行道 `.bashrc` 文件中去.
 
 ```bash
 alias make='mingw32-make'
 ```
 
-To build with MinGW
+要使用 MinGW 来构建
 
 ```bash
 cp make/mingw64.mk config.mk; make -j4
 ```
 
-To build with Visual Studio 2013 use cmake. Make sure you have a recent version of cmake added to your path and then from the xgboost directory:
+要使用 cmake 来与 Visual Studio 2013 构建. 确保你有最新版本的 cmake 并且已添加到你的 path 中. 然后从 xgboost 目录执行以下命令:
 
 ```bash
 mkdir build
@@ -114,64 +115,66 @@ cmake .. -G"Visual Studio 12 2013 Win64"
 
 This specifies an out of source build using the MSVC 12 64 bit generator. Open the .sln file in the build directory and build with Visual Studio. To use the Python module you can copy libxgboost.dll into python-package\xgboost.
 
-Other versions of Visual Studio may work but are untested.
+这指定使用 MSVC 12 64 位生成器的源代码来构建.
+在构建目录中打开 .sln 文件并使用 Visual Studio 进行构建.
+要使用 Python 模块, 您可以将 libxgboost.dll 复制到 python-package\xgboost 目录下去.
 
-### Customized Building
+其他版本的 Visual Studio 可能会工作, 但未经测试.
 
-The configuration of xgboost can be modified by ```config.mk```
-- modify configuration on various distributed filesystem such as HDFS/Amazon S3/...
-- First copy [make/config.mk](../make/config.mk) to the project root, on which
-  any local modification will be ignored by git, then modify the according flags.
+### 自定义构建
+
+xgboost 的配置可以通过 ```config.mk``` 来进行修改
+- 修改各种分布式文件系统上的配置, 如 HDFS/Amazon S3/ ...
+- 首先, 复制 [make/config.mk](../make/config.mk) 到项目的根目录下, 任何本地的修改都将被 git 忽略, 然后修改相应的 flags（标记）.
 
 
+## Python 软件包的安装
 
-## Python Package Installation
+python 软件包位于 [python-package](../python-package) 目录下.
+以下是几种安装软件包的方法:
 
-The python package is located at [python-package](../python-package).
-There are several ways to install the package:
-
-1. Install system-widely, which requires root permission
+1. 系统范围的安装, 需要 root 权限
 
    ```bash
    cd python-package; sudo python setup.py install
    ```
 
-   You will however need Python `distutils` module for this to
-   work. It is often part of the core python package or it can be installed using your
-   package manager, e.g. in Debian use
+   但是你需要 Python `distutils` 模块才能工作.
+   它通常是核心 python 软件包的一部分, 或者可以使用你的软件包管理器进行安装.
+   例如. 在 Debian 中使用以下命令
 
    ```bash
    sudo apt-get install python-setuptools
    ```
 
-   *NOTE: If you recompiled xgboost, then you need to reinstall it again to
-    make the new library take effect*
+   *注意: 如果您重新编译了 xgboost, 那么您需要重新安装它才能使新库生效*
 
-2. Only set the environment variable `PYTHONPATH` to tell python where to find
-   the library. For example, assume we cloned `xgboost` on the home directory
-   `~`. then we can added the following line in `~/.bashrc`.
-    It is ***recommended for developers*** who may change the codes. The changes will be immediately reflected once you pulled the code and rebuild the project (no need to call ```setup``` again)
+2. 只设置环境变量 `PYTHONPATH` 来让 python 知道在哪里可以找相关的库.
+   例如, 假设我们在主目录 `〜` 上克隆了 `xgboost`.
+   那么我们可以在 `〜/ .bashrc` 文件中加入下面这行.
+   这是 *推荐给哪些可能更改代码的开发者* 的.
+   一旦你 pull（拉取）代码并且重构该项目（不需要再次调用 ```setup```）, 这些更改就会立即体现出来.
 
     ```bash
     export PYTHONPATH=~/xgboost/python-package
     ```
 
-3. Install only for the current user.
+3. 只为当前用户安装.
 
     ```bash
     cd python-package; python setup.py develop --user
     ```
 
-4. If you are installing the latest xgboost version which requires compilation, add MinGW to the system PATH:
+4. 如果您正在安装需要编译的最新的 xgboost 版本, 请将 MinGW 添加到系统的 PATH 中去:
 
     ```python
     import os
     os.environ['PATH'] = os.environ['PATH'] + ';C:\\Program Files\\mingw-w64\\x86_64-5.3.0-posix-seh-rt_v4-rev0\\mingw64\\bin'
     ```
 
-## R Package Installation
+## R 软件包安装
 
-You can install R package from cran just like other packages, or you can install from our weekly updated drat repo:
+您可以像安装其他软件包一样从 cran 来安装 R 软件包, 也可以从我们每周更新的 drat 软件仓库来进行安装:
 
 ```r
 install.packages("drat", repos="https://cran.rstudio.com")
@@ -179,16 +182,16 @@ drat:::addRepo("dmlc")
 install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
 ```
 
-If you would like to use the latest xgboost version and already compiled xgboost, use `library(devtools); install('xgboost/R-package')` to install manually xgboost package (change the path accordingly to where you compiled xgboost).
+如果您想使用最新的 xgboost 版本, 并且已经编译了 xgboost, 请使用 `library(devtools); install('xgboost/R-package')` 来手动的安装 xgboost 软件包（根据你编译的 xgboost 来恰当的更改 path）
 
-For OSX users, single threaded version will be installed, to install multi-threaded version.
-First follow [Building on OSX](#building-on-osx) to get the OpenMP enabled compiler, then:
+对于 OSX 用户, 将安装单线程版本, 要安装多线程版本.
+首先按照 [在 OSX 上构建](#在 OSX 上构建) 上的说明来获取 OpenMP 激活的编译器, 然后:
 
-- Set the `Makevars` file in highest piority for R.
+- 为 R 设置最高优先级的 `Makevars` 文件.
 
-  The point is, there are three `Makevars` : `~/.R/Makevars`, `xgboost/R-package/src/Makevars`, and `/usr/local/Cellar/r/3.2.0/R.framework/Resources/etc/Makeconf` (the last one obtained by running `file.path(R.home("etc"), "Makeconf")` in R), and `SHLIB_OPENMP_CXXFLAGS` is not set by default!! After trying, it seems that the first one has highest piority (surprise!).
+  重点是, 有三种 `Makevars` : `~/.R/Makevars`, `xgboost/R-package/src/Makevars` 以及`/usr/local/Cellar/r/3.2.0/R.framework/Resources/etc/Makeconf` (最后一个通过在 R 中运行 `file.path(R.home("etc"), "Makeconf")` 来获得), 并且 `SHLIB_OPENMP_CXXFLAGS` 不是默认设置!! 在尝试后, 似乎第一个具有最高的优先级 (震精吧!).
 
-  Then inside R, run
+  然后在 R 中, 允许
 
   ```R
   install.packages("drat", repos="https://cran.rstudio.com")
@@ -196,8 +199,8 @@ First follow [Building on OSX](#building-on-osx) to get the OpenMP enabled compi
   install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
   ```
 
-Due to the usage of submodule, `install_github` is no longer support to install the
-latest version of R package. To install the latest version run the following bash script,
+由于子模块的使用, `install_github` 不再支持安装最新版本的 R 软件包.
+要安装最新的版本, 可以运行下面的 bash 脚本,
 
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
@@ -214,19 +217,19 @@ cp make/mingw64.mk config.mk
 make -j4
 ```
 
-## Trouble Shooting
+## 故障排查
 
-1. **Compile failed after `git pull`**
+1. **在 `git pull` 后编译失败**
 
-   Please first update the submodules, clean all and recompile:
+  请先 update the submodules, clean all 然后重新编译:
 
    ```bash
    git submodule update && make clean_all && make -j4
    ```
 
-2. **Compile failed after `config.mk` is modified**
+2. **在修改 `config.mk` 配置文件后编译失败**
 
-   Need to clean all first:
+   需要先 clean all:
 
     ```bash
     make clean_all && make -j4
@@ -235,7 +238,7 @@ make -j4
 
 3. **Makefile: dmlc-core/make/dmlc.mk: No such file or directory**
 
-   We need to recursively clone the submodule, you can do:
+   我们需要递归的 clone 子模块, 您可以这样做:
 
     ```bash
     git submodule init
