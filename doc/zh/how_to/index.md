@@ -1,16 +1,16 @@
-# XGBoost How To
+# XGBoost 入门指引
 
-This page contains guidelines to use and develop mxnets.
+该页面包含使用和开发 XGBoost 的一些指导。
 
-## Installation
-- [How to Install XGBoost](../build.md)
+## 安装
+- [如何安装 XGBoost](../build.md)
 
-## Use XGBoost in Specific Ways
-- [Parameter tunning guide](param_tuning.md)
-- [Use out of core computation for large dataset](external_memory.md)
+## 以特定的方式使用 XGBoost
+- [参数调整指南](param_tuning.md)
+- [使用大数据集的 out of core 计算](external_memory.md)
 
-## Develop and Hack XGBoost
-- [Contribute to XGBoost](contribute.md)
+## 开发和破解 XGBoost
+- [为 XGBoost 做贡献](contribute.md)
 
-## Frequently Ask Questions
+## 常见问题
 - [FAQ](../faq.md)

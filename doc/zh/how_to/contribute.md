@@ -1,145 +1,141 @@
-Contribute to XGBoost
+为 XGBoost 做贡献
 =====================
-XGBoost has been developed and used by a group of active community members.
-Everyone is more than welcome to contribute. It is a way to make the project better and more accessible to more users.
+XGBoost 已经被一群活跃的社区成员开发和使用。
+欢迎每个人来做贡献。这是使项目更好，更方便用户使用的一种方法。
 
-- Please add your name to [CONTRIBUTORS.md](../CONTRIBUTORS.md) after your patch has been merged.
-- Please also update [NEWS.md](../NEWS.md) to add note on your changes to the API or added a new document.
+- 当你的补丁被 merged 后，请将您的名字添加到 [CONTRIBUTORS.md](../CONTRIBUTORS.md) 。
+- 请同时更新 [NEWS.md](../NEWS.md) ，以便对 API 的更改添加注释或添加新文档。
 
-Guidelines
-----------
-* [Submit Pull Request](#submit-pull-request)
-* [Git Workflow Howtos](#git-workflow-howtos)
-  - [How to resolve conflict with master](#how-to-resolve-conflict-with-master)
-  - [How to combine multiple commits into one](#how-to-combine-multiple-commits-into-one)
-  - [What is the consequence of force push](#what-is-the-consequence-of-force-push)
-* [Document](#document)
-* [Testcases](#testcases)
-* [Examples](#examples)
-* [Core Library](#core-library)
-* [Python Package](#python-package)
-* [R Package](#r-package)
+指导方针
+--------------
+* [提交 Pull Request](#submit-pull-request)
+* [Git 工作流程](#git-workflow-howtos)
+  - [如何解决与 master 的冲突](#how-to-resolve-conflict-with-master)
+  - [如何将多个提交合并为一个](#how-to-combine-multiple-commits-into-one)
+  - [force push（强制 push）的后果是什么](#what-is-the-consequence-of-force-push)
+* [文档](#document)
+* [测试用例](#testcases)
+* [例子](#examples)
+* [核心库](#core-library)
+* [Python 包](#python-package)
+* [R 包](#r-package)
 
-Submit Pull Request
+提交 Pull Request
 -------------------
-* Before submit, please rebase your code on the most recent version of master, you can do it by
+* 在提交之前，请将您的代码重新与最新版本的 master 上的代码做一次同步（rebase），您可以这么做
 ```bash
 git remote add upstream https://github.com/dmlc/xgboost
 git fetch upstream
 git rebase upstream/master
 ```
-* If you have multiple small commits,
-  it might be good to merge them together(use git rebase then squash) into more meaningful groups.
-* Send the pull request!
-  - Fix the problems reported by automatic checks
-  - If you are contributing a new module, consider add a testcase in [tests](../tests)
+* 如果你有多个小提交，可以将它们 merge 到一起 (使用 git rebase 然后 squash) 成为更有意义的组。
+* 发送 pull request!
+  - 修复自动检查报告的问题
+  - 如果您正在贡献一个新模块，请考虑在 [tests](../tests) 中添加一个测试用例
 
-Git Workflow Howtos
+Git 工作流程
 -------------------
-### How to resolve conflict with master
-- First rebase to most recent master
+### 如何解决与 master 的冲突
+- 首先 rebase 到最新的 master
 ```bash
-# The first two steps can be skipped after you do it once.
+# 做完一次后，可以跳过前两个步骤
 git remote add upstream https://github.com/dmlc/xgboost
 git fetch upstream
 git rebase upstream/master
 ```
-- The git may show some conflicts it cannot merge, say ```conflicted.py```.
-  - Manually modify the file to resolve the conflict.
-  - After you resolved the conflict, mark it as resolved by
+- git 可能会显示一些它不能合并的冲突，比如说 ```conflicted.py``` 。
+  - 手动修改文件以解决冲突。
+  - 解决冲突后，将其标记为已解决
 ```bash
 git add conflicted.py
 ```
-- Then you can continue rebase by
+- 那么你可以继续 rebase 通过 
 ```bash
 git rebase --continue
 ```
-- Finally push to your fork, you may need to force push here.
+- 最后 push 到你的 fork 上，你可能需要在这里 force push（强制 push）。
 ```bash
 git push --force
 ```
 
-### How to combine multiple commits into one
-Sometimes we want to combine multiple commits, especially when later commits are only fixes to previous ones,
-to create a PR with set of meaningful commits. You can do it by following steps.
-- Before doing so, configure the default editor of git if you haven't done so before.
+### 如何将多个提交合并为一个
+有时候我们想要合并多个 commits（提交），特别是当以后的 commits（提交）只能修复以前的提交时，创建一个有意义的提交集合的 PR 。你可以通过以下步骤来完成。
+- 在此之前，如果您之前没有这样做，请配置 git 的默认编辑器。
 ```bash
 git config core.editor the-editor-you-like
 ```
-- Assume we want to merge last 3 commits, type the following commands
+- 假设我们要 merge 最后 3 个 commits，请输入以下命令
 ```bash
 git rebase -i HEAD~3
 ```
-- It will pop up an text editor. Set the first commit as ```pick```, and change later ones to ```squash```.
-- After you saved the file, it will pop up another text editor to ask you modify the combined commit message.
-- Push the changes to your fork, you need to force push.
+- 它会弹出一个文本编辑器。将第一个 commit 设置为 ```pick``` ，将后一个 commit 更改为 ```squash``` 。
+- 保存文件之后，会弹出另一个文本编辑器，要求你修改合并的 commit message（提交信息）。
+- 将更改 push 到你的 fork ，你需要强制 push（force push）。
 ```bash
 git push --force
 ```
 
-### What is the consequence of force push
-The previous two tips requires force push, this is because we altered the path of the commits.
-It is fine to force push to your own fork, as long as the commits changed are only yours.
+### force push（强制 push）的后果是什么
+前两个提示需要强制 push（force push），这是因为我们改变了提交的路径。
+只要提交的内容只属于你自己的内容，就可以强制 push 到自己的 fork 。
 
-Documents
----------
-* The document is created using sphinx and [recommonmark](http://recommonmark.readthedocs.org/en/latest/)
-* You can build document locally to see the effect.
+文档
+---------------
+* 该文档是使用 sphinx 和 [recommonmark](http://recommonmark.readthedocs.org/en/latest/) 创建的。
+* 你可以在本地构建文档以查看效果。
 
-Testcases
----------
-* All the testcases are in [tests](../tests)
-* We use python nose for python test cases.
+测试用例
+---------------------
+* 所有的测试用例在 [tests](../tests) 中。
+* 我们使用 python nose 进行 python 测试用例。
 
-Examples
---------
-* Usecases and examples will be in [demo](../demo)
-* We are super excited to hear about your story, if you have blogposts,
-  tutorials code solutions using xgboost, please tell us and we will add
-  a link in the example pages.
+示例
+------------------
+* 用例和示例将在 [demo](../demo) 中
+* 我们非常高兴听到您的故事，如果您有使用 xgboost 的博客，教程代码解决方案，请告诉我们，我们将在示例页面中添加一个链接。
 
-Core Library
-------------
-- Follow Google C style for C++.
-- We use doxygen to document all the interface code.
-- You can reproduce the linter checks by typing ```make lint```
+核心库
+--------------------
+- 遵循 C++ 的 Google C 的风格。
+- 我们使用 doxygen 来记录所有的接口代码。
+- 你可以通过输入 ```make lint``` 来重新产生 linter 。
 
-Python Package
+Python 包
 --------------
-- Always add docstring to the new functions in numpydoc format.
-- You can reproduce the linter checks by typing ```make lint```
+- 总是将 docstring（文档字符串） 添加到 numpydoc 格式的新函数中。
+- 你可以通过输入 ```make lint``` 来重新生成 linter 。
 
-R Package
+R 包
 ---------
-### Code Style
-- We follow Google's C++ Style guide on C++ code.
-  - This is mainly to be consistent with the rest of the project.
-  - Another reason is we will be able to check style automatically with a linter.
-- You can check the style of the code by typing the following command at root folder.
+### 代码风格
+- 我们在 C++ 代码上遵循 Google 的 C++ 风格指南。
+  - 这主要与项目的其他部分保持一致。
+  - 另一个原因是我们可以用 linter 自动检查样式。
+- 你可以通过在根文件夹中键入以下命令来检查代码的样式。
 ```bash
 make rcpplint
 ```
-- When needed, you can disable the linter warning of certain line with ```// NOLINT(*)``` comments.
+- 在需要的时候，你可以用 ```// NOLINT(*)``` 注释来禁用某行的 linter 警告。
 
 ### Rmarkdown Vignettes
-Rmarkdown vignettes are placed in [R-package/vignettes](../R-package/vignettes)
-These Rmarkdown files are not compiled. We host the compiled version on [doc/R-package](R-package)
+Rmarkdown vignettes 放置在 [R-package/vignettes](../R-package/vignettes)
+这些 Rmarkdown 文件不被编译。我们在 [doc/R-package](R-package) 上托管编译的版本。
 
-The following steps are followed to add a new Rmarkdown vignettes:
-- Add the original rmarkdown to ```R-package/vignettes```
-- Modify ```doc/R-package/Makefile``` to add the markdown files to be build
-- Clone the [dmlc/web-data](https://github.com/dmlc/web-data) repo to folder ```doc```
-- Now type the following command on ```doc/R-package```
+按照以下步骤添加一个新的 Rmarkdown vignettes: 
+- 将原始的 rmarkdown 添加到 ```R-package/vignettes```
+- 修改 ```doc/R-package/Makefile``` 来添加要构建的 markdown 文件
+- Clone [dmlc/web-data](https://github.com/dmlc/web-data) 仓库到 ```doc``` 文件夹中
+- 现在在 ```doc/R-package``` 上输入以下命令
 ```bash
 make the-markdown-to-make.md
 ```
-- This will generate the markdown, as well as the figures into ```doc/web-data/xgboost/knitr```
-- Modify the ```doc/R-package/index.md``` to point to the generated markdown.
-- Add the generated figure to the ```dmlc/web-data``` repo.
-  - If you already cloned the repo to doc, this means a ```git add```
-- Create PR for both the markdown  and ```dmlc/web-data```
-- You can also build the document locally by typing the followig command at ```doc```
+- 这将生成 markdown 以及 figure（图形）到 ```doc/web-data/xgboost/knitr``` 中
+- 修改 ```doc/R-package/index.md``` 来指向生成的 markdown 。
+- 将生成的 figure 添加到 ```dmlc/web-data``` 仓库。
+  - 如果你已经将 repo clone 到 doc，这意味着一个 ```git add```
+- 为 markdown 和 ```dmlc/web-data``` 创建 PR
+- 你也可以通过在 ```doc``` 处输入以下命令在本地生成文档
 ```bash
 make html
 ```
-The reason we do this is to avoid exploded repo size due to generated images sizes.
+我们这样做的原因是为了避免由于生成的图像 size 导致 repo 的 size 爆炸。

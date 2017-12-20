@@ -1,44 +1,37 @@
-Notes on Parameter Tuning
+参数调整注意事项
 =========================
-Parameter tuning is a dark art in machine learning, the optimal parameters
-of a model can depend on many scenarios. So it is impossible to create a
-comprehensive guide for doing so.
+参数调整是机器学习中的一门暗艺术，模型的最优参数可以依赖于很多场景。所以要创建一个全面的指导是不可能的。
 
-This document tries to provide some guideline for parameters in xgboost.
+本文档试图为 xgboost 中的参数提供一些指导意见。
 
 
-Understanding Bias-Variance Tradeoff
-------------------------------------
-If you take a machine learning or statistics course, this is likely to be one
-of the most important concepts.
-When we allow the model to get more complicated (e.g. more depth), the model
-has better ability to fit the training data, resulting in a less biased model.
-However, such complicated model requires more data to fit.
+理解 Bias-Variance（偏差-方差）权衡
+--------------------------------------------
+如果你了解一些机器学习或者统计课程，你会发现这可能是最重要的概念之一。
+当我们允许模型变得更复杂（例如深度更深）时，模型具有更好的拟合训练数据的能力，会产生一个较少的偏差模型。
+但是，这样复杂的模型需要更多的数据来拟合。
 
-Most of parameters in xgboost are about bias variance tradeoff. The best model
-should trade the model complexity with its predictive power carefully.
-[Parameters Documentation](parameter.md) will tell you whether each parameter
-will make the model more conservative or not. This can be used to help you
-turn the knob between complicated model and simple model.
+xgboost 中的大部分参数都是关于偏差方差的权衡的。最好的模型应该仔细地将模型复杂性与其预测能力进行权衡。
+[参数文档](parameter.md) 会告诉你每个参数是否会使得模型更加 conservative （保守）与否。这可以帮助您在复杂模型和简单模型之间灵活转换。
 
-Control Overfitting
+控制过拟合
 -------------------
-When you observe high training accuracy, but low tests accuracy, it is likely that you encounter overfitting problem.
+当你观察到训练精度高，但是测试精度低时，你可能遇到了过拟合的问题。
 
-There are in general two ways that you can control overfitting in xgboost
-* The first way is to directly control model complexity
-  - This include ```max_depth```, ```min_child_weight``` and ```gamma```
-* The second way is to add randomness to make training robust to noise
-  - This include ```subsample```, ```colsample_bytree```
-  - You can also reduce stepsize ```eta```, but needs to remember to increase ```num_round``` when you do so.
+通常有两种方法可以控制 xgboost 中的过拟合。
+* 第一个方法是直接控制模型的复杂度
+  - 这包括 ```max_depth```, ```min_child_weight``` 和 ```gamma```
+* 第二种方法是增加随机性，使训练对噪声强健
+  - 这包括 ```subsample```, ```colsample_bytree```
+  - 你也可以减小步长 ```eta```, 但是当你这么做的时候需要记得增加 ```num_round``` 。
 
-Handle Imbalanced Dataset
--------------------------
-For common cases such as ads clickthrough log, the dataset is extremely imbalanced.
-This can affect the training of xgboost model, and there are two ways to improve it.
-* If you care only about the ranking order (AUC) of your prediction
-  - Balance the positive and negative weights, via ```scale_pos_weight```
-  - Use AUC for evaluation
-* If you care about predicting the right probability
-  - In such a case, you cannot re-balance the dataset
-  - In such a case, set parameter ```max_delta_step``` to a finite number (say 1) will help convergence
+处理不平衡的数据集
+---------------------------------------
+对于广告点击日志等常见情况，数据集是极不平衡的。
+这可能会影响 xgboost 模型的训练，有两种方法可以改善它。
+* 如果你只关心预测的排名顺序 (AUC) 
+  - 通过 ```scale_pos_weight``` 来平衡 positive 和 negative 权重。
+  - 使用 AUC 进行评估
+* 如果你关心预测正确的概率
+  - 在这种情况下，您无法重新平衡数据集
+  - 在这种情况下，将参数 ```max_delta_step``` 设置为有限数字（比如说1）将有助于收敛
