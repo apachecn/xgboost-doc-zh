@@ -1,9 +1,9 @@
-# XGBoost Tutorials
+# XGBoost 教程
 
-This section contains official tutorials inside XGBoost package.
-See [Awesome XGBoost](https://github.com/dmlc/xgboost/tree/master/demo) for links to mores resources.
+本节包含 XGBoost 包中的官方教程。
+参阅 [Awesome XGBoost](https://github.com/dmlc/xgboost/tree/master/demo) 找到更多的资源。
 
-## Contents
-- [Introduction to Boosted Trees](../model.md)
-- [Distributed XGBoost YARN on AWS](aws_yarn.md)
+## 目录
+- [Boosted Trees 介绍](../model.md)
+- [在 AWS 上的分布式 XGBoost YARN](aws_yarn.md)
 - [DART booster](dart.md)
