@@ -1,65 +1,59 @@
-Frequently Asked Questions
+常见问题
 ========================
-This document contains frequently asked questions about xgboost.
+此文档包含有关 xgboost 的常见问题。
 
-How to tune parameters
+如何调参
 ----------------------
-See [Parameter Tunning Guide](param_tuning.md)
+参阅 [参数调整指南](param_tuning.md)
 
-Description on the model
+模型的描述
 ------------------------
-See [Introduction to Boosted Trees](model.md)
+参阅 [介绍 Boosted Trees](model.md)
 
 
-I have a big dataset
+我有一个很大的数据集
 --------------------
-XGBoost is designed to be memory efficient. Usually it can handle problems as long as the data fit into your memory
-(This usually means millions of instances).
-If you are running out of memory, checkout [external memory version](external_memory.md) or
-[distributed version](https://github.com/dmlc/wormhole/tree/master/learn/xgboost) of xgboost.
+XGBoost 被设计为 memory efficient （高效使用内存）的。通常数据符合你的内存就可以处理问题（这通常意味着数百万个实例）。
+如果内存不足，请查看 [外部存储器版本](external_memory.md) 或 xgboost 的 [分布式版本](https://github.com/dmlc/wormhole/tree/master/learn/xgboost) 。
 
 
-Running xgboost on Platform X (Hadoop/Yarn, Mesos)
---------------------------------------------------
-The distributed version of XGBoost is designed to be portable to various environment.
-Distributed XGBoost can be ported to any platform that supports [rabit](https://github.com/dmlc/rabit).
-You can directly run xgboost on Yarn. In theory Mesos and other resource allocation engines can be easily supported as well.
+在平台 X (Hadoop/Yarn, Mesos) 上运行 xgboost 
+---------------------------------------------------------
+XGBoost 的分布式版本被设计为可移植到各种环境。
+分布式 XGBoost 可以移植到任何支持 [rabit](https://github.com/dmlc/rabit) 的平台上。
+你可以直接在 Yarn 上运行 xgboost 。理论上 Mesos 和其他资源分配引擎也可以很容易地支持。
 
 
-Why not implement distributed xgboost on top of X (Spark, Hadoop)
+为什么不在 X (Spark, Hadoop) 之上实现分布式 xgboost 
 -----------------------------------------------------------------
-The first fact we need to know is going distributed does not necessarily solve all the problems.
-Instead, it creates more problems such as more communication overhead and fault tolerance.
-The ultimate question will still come back to how to push the limit of each computation node
-and use less resources to complete the task (thus with less communication and chance of failure).
+我们需要知道的第一个事实是分布式并不一定能解决所有的问题。
+相反，它会产生更多的问题，如更多的通信开销和容错。
+最终的问题还是要回到如何推动每个计算节点的限制，并使用更少的资源来完成任务（从而减少通信和失败的机会）。
 
-To achieve these, we decide to reuse the optimizations in the single node xgboost and build distributed version on top of it.
-The demand of communication in machine learning is rather simple, in the sense that we can depend on a limited set of API (in our case rabit).
-Such design allows us to reuse most of the code, while being portable to major platforms such as Hadoop/Yarn, MPI, SGE.
-Most importantly, it pushes the limit of the computation resources we can use.
+为了实现这些，我们决定在单个节点 xgboost 中重用优化，并在其上构建分布式版本。
+机器学习中的通信需求是相当简单的，因为我们可以依赖于一套有限的 API (在我们的案例中)。
+这样的设计使我们能够重用大部分代码，同时可以移植到 Hadoop/Yarn, MPI, SGE 等主流平台上。
+最重要的是，它推动了我们可以使用的计算资源的限制。
 
 
-How can I port the model to my own system
+如何将模型移植到我自己的系统中
 -----------------------------------------
-The model and data format of XGBoost is exchangable,
-which means the model trained by one language can be loaded in another.
-This means you can train the model using R, while running prediction using
-Java or C++, which are more common in production systems.
-You can also train the model using distributed versions,
-and load them in from Python to do some interactive analysis.
+XGBoost 的模型和数据格式是可交换的，这意味着一种语言训练的模型可以加载到另一种语言。
+这意味着您可以使用 R 训练模型，同时使用 Java 或 C++ 进行预测，这在生产系统中更为常见。
+您还可以使用分布式版本训练模型，并从 Python 加载它们以进行一些交互式分析。
 
 
-Do you support LambdaMART
--------------------------
-Yes, xgboost implements LambdaMART. Checkout the objective section in [parameters](parameter.md)
+你支持 LambdaMART 吗
+----------------------------------------------
+是的，xgboost 实现了 LambdaMART 。在 [参数](parameter.md) 中可以查看到你想要的部分。
 
 
-How to deal with Missing Value
+如何处理缺失值
 ------------------------------
-xgboost support missing value by default
+xgboost 默认是支持缺失值的。
 
 
-Slightly different result between runs
+运行结果略有不同
 --------------------------------------
-This could happen, due to non-determinism in floating point summation order and multi-threading.
-Though the general accuracy will usually remain the same.
+由于浮点求和顺序和多线程的非确定性，可能会发生这种情况。
+虽然一般的准确性通常会保持不变。
