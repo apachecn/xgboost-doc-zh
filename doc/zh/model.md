@@ -1,122 +1,119 @@
-Introduction to Boosted Trees
+Boosted Trees 介绍
 =============================
-XGBoost is short for "Extreme Gradient Boosting", where the term "Gradient Boosting" is proposed in the paper _Greedy Function Approximation: A Gradient Boosting Machine_, by Friedman.
-XGBoost is based on this original model.
-This is a tutorial on gradient boosted trees, and most of the content is based on these [slides](http://homes.cs.washington.edu/~tqchen/pdf/BoostedTree.pdf) by the author of xgboost.
+XGBoost 是 "Extreme Gradient Boosting" 的缩写，其中 "Gradient Boosting" 一词在论文 _Greedy Function Approximation: A Gradient Boosting Machine_ 中，由 Friedman 提出。
+XGBoost 基于这个原始模型。
+这是 gradient boosted trees（梯度增强树）的教程，大部分内容是基于 xgboost 的作者的这些 [slides](http://homes.cs.washington.edu/~tqchen/pdf/BoostedTree.pdf) 。
 
-The GBM (boosted trees) has been around for really a while, and there are a lot of materials on the topic.
-This tutorial tries to explain boosted trees in a self-contained and principled way using the elements of supervised learning.
-We think this explanation is cleaner, more formal, and motivates the variant used in xgboost.
+GBM （boosted trees，增强树）已经有一段时间了，关于这个话题有很多的材料。
+这个教程试图用监督学习的元素以独立和有原则的方式解释 boosted trees （增强树）。
+我们认为这个解释更加清晰，更加正式，并激发了 xgboost 中使用的变体。
 
-Elements of Supervised Learning
+监督学习的要素
 -------------------------------
-XGBoost is used for supervised learning problems, where we use the training data ``$ x_i $`` to predict a target variable ``$ y_i $``.
-Before we dive into trees, let us start by reviewing the basic elements in supervised learning.
+XGBoost 用于监督学习问题，我们使用训练数据 ``$ x_i $`` 来预测目标变量 ``$ y_i $`` 。
+在我们深入了解 boosted trees 之前，首先回顾一下监督学习的重要组成部件。
 
-### Model and Parameters
-The ***model*** in supervised learning usually refers to the mathematical structure of how to make the prediction ``$ y_i $`` given ``$ x_i $``.
-For example, a common model is a *linear model*, where the prediction is given by ``$ \hat{y}_i = \sum_j w_j x_{ij} $``, a linear combination of weighted input features.
-The prediction value can have different interpretations, depending on the task.
-For example, it can be logistic transformed to get the probability of positive class in logistic regression, and it can also be used as a ranking score when we want to rank the outputs.
+### 模型和参数
+监督学习中的 ***model（模型）*** 通常是指给定输入 ``$ x_i $`` 如何去预测输出 ``$ y_i $`` 的数学结构。
+例如，一个常见的模型是一个 *linear model（线性模型）*（如线性回归和 logistic regression），其中的预测是由 ``$ \hat{y}_i = \sum_j w_j x_{ij} $`` 给出的，这是加权输入特征的线性组合（线性叠加的方式）。
+其实这里的预测 ``$ y $`` 可以有不同的解释，取决于做的任务。
+例如，我们可以通过 logistic 转换得到 logistic regression 中 positive 类别的概率，当我们想要对输出结果排序的时候，也可以作为排序得分指标等。
 
-The ***parameters*** are the undetermined part that we need to learn from data. In linear regression problems, the parameters are the coefficients ``$ w $``.
-Usually we will use ``$ \Theta $`` to denote the parameters.
+***parameters（参数）*** 是我们需要从数据中学习的未确定部分。在线性回归问题中，参数是系数 ``$ w $`` 。
+通常我们使用 ``$ \Theta $`` 来表示参数。
 
-### Objective Function : Training Loss + Regularization
+### 目标函数：训练损失 + 正则
 
-Based on different understandings of ``$ y_i $`` we can have different problems, such as regression, classification, ordering, etc.
-We need to find a way to find the best parameters given the training data. In order to do so, we need to define a so-called ***objective function***,
-to measure the performance of the model given a certain set of parameters.
+基于对 ``$ y_i $`` 的不同理解，我们可以得到不同的问题，比如回归，分类，排序等。
+我们需要找到一种方法来找到训练数据的最佳参数。为了做到这一点，我们需要定义一个所谓的 ***objective function（目标函数）*** 以给定一组参数来衡量模型的性能。
 
-A very important fact about objective functions is they ***must always*** contain two parts: training loss and regularization.
+关于目标函数的一个非常重要的事实是，它们 ***must always（必须总是）*** 包含两个部分：training loss （训练损失） 和 regularization（正则化）。
 
 ```math
 Obj(\Theta) = L(\Theta) + \Omega(\Theta)
 ```
 
-where ``$ L $`` is the training loss function, and ``$ \Omega $`` is the regularization term. The training loss measures how *predictive* our model is on training data.
-For example, a commonly used training loss is mean squared error.
+其中 ``$ L $`` 是训练损失函数， ``$ \Omega $`` 是正则化项。 training loss （训练损失）衡量我们的数据对训练数据的预测性。
+例如，常用的训练损失是 mean squared error（均方误差，MSE）。
 
 ```math
 L(\Theta) = \sum_i (y_i-\hat{y}_i)^2
 ```
-Another commonly used loss function is logistic loss for logistic regression
+另一个常用的损失函数是 logistic 回归的 logistic 损失。
 
 ```math
 L(\theta) = \sum_i[ y_i\ln (1+e^{-\hat{y}_i}) + (1-y_i)\ln (1+e^{\hat{y}_i})]
 ```
 
-The ***regularization term*** is what people usually forget to add. The regularization term controls the complexity of the model, which helps us to avoid overfitting.
-This sounds a bit abstract, so let us consider the following problem in the following picture. You are asked to *fit* visually a step function given the input data points
-on the upper left corner of the image.
-Which solution among the three do you think is the best fit?
+***regularization term（正则化项）*** 是人们通常忘记添加的内容。正则化项控制模型的复杂性，这有助于避免过拟合。
+这听起来有些抽象，那么我们在下面的图片中考虑下面的问题。在图像左上角给出输入数据点的情况下，要求您在视觉上 *fit（拟合）* 一个 step function（阶梯函数）。
+您认为三种中的哪一种解决方案是最拟合效果最好的？
 
 ![Step function](https://raw.githubusercontent.com/dmlc/web-data/master/xgboost/model/step_fit.png)
 
-The answer is already marked as red. Please think if it is reasonable to you visually. The general principle is we want a ***simple*** and ***predictive*** model.
-The tradeoff between the two is also referred as bias-variance tradeoff in machine learning.
+答案已经标注为红色了。请思考一下这个是否在你的视觉上较为合理？总的原则是我们想要一个 ***simple（简单）*** 和 ***predictive（可预测）*** 的模型。
+两者之间的权衡也被称为机器学习中的 bias-variance tradeoff（偏差-方差 权衡）。
+
+对于线性模型常见的正则化项有 ``$ L_2 $`` 正则和 ``$ L_1 $`` 正则。这样的目标函数的设计来自于统计学习中的一个重要概念，也是我们刚才说的， bias-variance tradeoff（偏差-方差 权衡）。比较感性的理解， Bias 可以理解为假设我们有无限多数据的时候，可以训练出最好的模型所拿到的误差。而 Variance 是因为我们只有有限数据，其中随机性带来的误差。目标中误差函数鼓励我们的模型尽可能去拟合训练数据，这样相对来说最后的模型会有比较小的 bias 。而正则化项则鼓励更加简单的模型。因为当模型简单之后，有限数据拟合出来结果的随机性比较小，不容易过拟合，使得最后模型的预测更加稳定。
 
 
-### Why introduce the general principle
-The elements introduced above form the basic elements of supervised learning, and they are naturally the building blocks of machine learning toolkits.
-For example, you should be able to describe the differences and commonalities between boosted trees and random forests.
-Understanding the process in a formalized way also helps us to understand the objective that we are learning and the reason behind the heuristics such as
-pruning and smoothing.
+### 为什么要介绍 general principle（一般原则）
 
-Tree Ensemble
--------------
-Now that we have introduced the elements of supervised learning, let us get started with real trees.
-To begin with, let us first learn about the ***model*** of xgboost: tree ensembles.
-The tree ensemble model is a set of classification and regression trees (CART). Here's a simple example of a CART
-that classifies whether someone will like computer games.
+上面介绍的要素构成了监督学习的基本要素，它们自然是机器学习工具包的基石。
+例如，你应该能够描述 boosted trees 和 random forests 之间的差异和共同点。
+以正式的方式理解这个过程也有助于我们理解我们正在学习的目标以及启发式算法背后的原因，例如 pruning 和 smoothing 。
+
+tree ensembles（树集成）
+---------------------------------
+
+既然我们已经介绍了监督学习的内容，那么接下来让我们开始介绍真正的 trees 吧。
+首先，让我们先来了解一下 xgboost 的 ***model（模型）*** ： tree ensembles（树集成）。
+树集成模型是一组 classification and regression trees （CART）。
+下面是一个 CART 的简单的示例，它可以分类是否有人喜欢电脑游戏。
 
 ![CART](https://raw.githubusercontent.com/dmlc/web-data/master/xgboost/model/cart.png)
 
-We classify the members of a family into different leaves, and assign them the score on corresponding leaf.
-A CART is a bit different from decision trees, where the leaf only contains decision values. In CART, a real score
-is associated with each of the leaves, which gives us richer interpretations that go beyond classification.
-This also makes the unified optimization step easier, as we will see in later part of this tutorial.
+我们把一个家庭的成员分成不同的叶子，并把他们分配到相应的叶子节点上。
+CART 与 decision trees（决策树）有些许的不同，就是叶子只包含决策值。在 CART 中，每个叶子都有一个 real score （真实的分数），这给了我们更丰富的解释，超越了分类。
+这也使得统一的优化步骤更容易，我们将在本教程的后面部分看到。
 
-Usually, a single tree is not strong enough to be used in practice. What is actually used is the so-called
-tree ensemble model, that sums the prediction of multiple trees together.
+通常情况下，单棵树由于过于简单而不够强大到可以支持在实践中使用的。实际使用的是所谓的 tree ensemble model（树集成模型），它将多棵树的预测加到一起。
 
 ![TwoCART](https://raw.githubusercontent.com/dmlc/web-data/master/xgboost/model/twocart.png)
 
-Here is an example of tree ensemble of two trees. The prediction scores of each individual tree are summed up to get the final score.
-If you look at the example, an important fact is that the two trees try to *complement* each other.
-Mathematically, we can write our model in the form
+上图是两棵树的集成的例子。将每棵树的预测分数加起来得到最终分数。
+如果你看一下这个例子，一个重要的事实就是两棵树互相 *complement（补充）* 。
+在数学表示上，我们可以在表单中编写我们的模型。
 
 ```math
 \hat{y}_i = \sum_{k=1}^K f_k(x_i), f_k \in \mathcal{F}
 ```
 
-where ``$ K $`` is the number of trees, ``$ f $`` is a function in the functional space ``$ \mathcal{F} $``, and ``$ \mathcal{F} $`` is the set of all possible CARTs. Therefore our objective to optimize can be written as
+其中 ``$ K $`` 是树的数量， ``$ f $`` 是函数空间 ``$ \mathcal{F} $`` 的函数， ``$ \mathcal{F} $`` 是所有可能的 CARTs 的集合。所以我们优化的目标可以写成
 
 ```math
 obj(\Theta) = \sum_i^n l(y_i, \hat{y}_i) + \sum_{k=1}^K \Omega(f_k)
 ```
-Now here comes the question, what is the *model* for random forests? It is exactly tree ensembles! So random forests and boosted trees are not different in terms of model,
-the difference is how we train them. This means if you write a predictive service of tree ensembles, you only need to write one of them and they should directly work
-for both random forests and boosted trees. One example of why elements of supervised learning rocks.
+那么问题来了，random forests（随机森林）的 *model（模型）* 是什么？这正是 tree ensembles（树集成）！所以 random forests 和 boosted trees 在模型上并没有什么不同，不同之处在于我们如何训练它们。这意味着如果你写一个 tree ensembles（树集成）的预测服务，你只需要编写它们中的一个，它们应该直接为 random forests（随机森林）和 boosted trees（增强树）工作。这也是监督学习基石元素的一个例子。
 
 Tree Boosting
 -------------
-After introducing the model, let us begin with the real training part. How should we learn the trees?
-The answer is, as is always for all supervised learning models: *define an objective function, and optimize it*!
 
-Assume we have the following objective function (remember it always need to contain training loss, and regularization)
+在介绍完模型之后，我们从真正的训练部分开始。我们应该怎么学习 trees 呢？
+答案是，对于所有的监督学习模型都一样的处理：*定义一个合理的目标函数，然后去尝试优化它*！
+
+假设我们有以下目标函数（记住它总是需要包含训练损失和正则化）
 ```math
 Obj = \sum_{i=1}^n l(y_i, \hat{y}_i^{(t)}) + \sum_{i=1}^t\Omega(f_i) \\
 ```
 
-### Additive Training
+### 附加训练
 
-First thing we want to ask is what are the ***parameters*** of trees.
-You can find what we need to learn are those functions ``$f_i$``, with each containing the structure
-of the tree and the leaf scores. This is much harder than traditional optimization problem where you can take the gradient and go.
-It is not easy to train all the trees at once.
-Instead, we use an additive strategy: fix what we have learned, add one new tree at a time.
-We note the prediction value at step ``$t$`` by ``$ \hat{y}_i^{(t)}$``, so we have
+我们想要问的第一件事就是树的 ***parameters（参数）*** 是什么。
+你可能已经发现了，我们要学习的是那些函数 ``$f_i$`` ，每个函数都包含树的结构和叶子分数。这比传统的你可以找到捷径的优化问题要难得多。在 tree ensemble 中，参数对应了树的结构，以及每个叶子节点上面的预测分数。
+一次性训练所有的树并不容易。
+相反，我们使用一个附加的策略：优化好我们已经学习完成的树，然后一次添加一棵新的树。
+我们通过 ``$ \hat{y}_i^{(t)}$`` 来关注步骤 ``$t$`` 的预测值，所以我们有
 
 ```math
 \hat{y}_i^{(0)} &= 0\\
@@ -126,116 +123,111 @@ We note the prediction value at step ``$t$`` by ``$ \hat{y}_i^{(t)}$``, so we ha
 \hat{y}_i^{(t)} &= \sum_{k=1}^t f_k(x_i)= \hat{y}_i^{(t-1)} + f_t(x_i)
 ```
 
-It remains to ask, which tree do we want at each step?  A natural thing is to add the one that optimizes our objective.
+另外还有一个问题，每一步我们想要哪棵 tree 呢？一个自然而然的事情就是添加一个优化我们目标的方法。
 
 ```math
 Obj^{(t)} & = \sum_{i=1}^n l(y_i, \hat{y}_i^{(t)}) + \sum_{i=1}^t\Omega(f_i) \\
           & = \sum_{i=1}^n l(y_i, \hat{y}_i^{(t-1)} + f_t(x_i)) + \Omega(f_t) + constant
 ```
 
-If we  consider using MSE as our loss function, it becomes the following form.
+如果我们考虑使用 MSE 作为我们的损失函数，它将是下面的形式。
 
 ```math
 Obj^{(t)} & = \sum_{i=1}^n (y_i - (\hat{y}_i^{(t-1)} + f_t(x_i)))^2 + \sum_{i=1}^t\Omega(f_i) \\
           & = \sum_{i=1}^n [2(\hat{y}_i^{(t-1)} - y_i)f_t(x_i) + f_t(x_i)^2] + \Omega(f_t) + constant
 ```
 
-The form of MSE is friendly, with a first order term (usually called residual) and a quadratic term.
-For other losses of interest (for example, logistic loss), it is not so easy to get such a nice form.
-So in the general case, we take the Taylor expansion of the loss function up to the second order
+MSE 的形式比较友好，具有一阶项（通常称为残差）和二次项。
+对于其他形式的损失（例如，logistic loss），获得这么好的形式并不是那么容易。
+所以在一般情况下，我们把损失函数的泰勒展开到二阶
 
 ```math
 Obj^{(t)} = \sum_{i=1}^n [l(y_i, \hat{y}_i^{(t-1)}) + g_i f_t(x_i) + \frac{1}{2} h_i f_t^2(x_i)] + \Omega(f_t) + constant
 ```
-where the ``$g_i$`` and ``$h_i$`` are defined as
+其中 ``$g_i$`` 和 ``$h_i$`` 被定义为
 
 ```math
 g_i &= \partial_{\hat{y}_i^{(t-1)}} l(y_i, \hat{y}_i^{(t-1)})\\
 h_i &= \partial_{\hat{y}_i^{(t-1)}}^2 l(y_i, \hat{y}_i^{(t-1)})
 ```
 
-After we remove all the constants, the specific objective at step ``$t$`` becomes
+我们删除了所有的常量之后， ``$t$`` 步骤中的具体目标就变成了
 
 ```math
 \sum_{i=1}^n [g_i f_t(x_i) + \frac{1}{2} h_i f_t^2(x_i)] + \Omega(f_t)
 ```
 
-This becomes our optimization goal for the new tree. One important advantage of this definition is that
-it only depends on ``$g_i$`` and ``$h_i$``. This is how xgboost can support custom loss functions.
-We can optimize every loss function, including logistic regression, weighted logistic regression, using exactly
-the same solver that takes ``$g_i$`` and ``$h_i$`` as input!
+这成为了新树的优化目标。这个定义的一个重要优点是它只依赖于 ``$g_i$`` 和 ``$h_i$`` 。这就是 xgboost 如何支持自定义损失函数。
+我们可以使用完全相同的使用 ``$g_i$`` 和 ``$h_i$`` 作为输入的 solver（求解器）来对每个损失函数进行优化，包括 logistic regression， weighted logistic regression。
 
-### Model Complexity
-We have introduced the training step, but wait, there is one important thing, the ***regularization***!
-We need to define the complexity of the tree ``$\Omega(f)$``. In order to do so, let us first refine the definition of the tree a tree ``$ f(x) $`` as
+### 模型复杂度
+我们已经介绍了训练步骤，但是等等，还有一个重要的事情，那就是 ***regularization（正则化）*** ！
+我们需要定义树的复杂度 ``$\Omega(f)$`` 。为了做到这一点，让我们首先改进一棵树的定义 ``$ f(x) $`` 如下
 
 ```math
 f_t(x) = w_{q(x)}, w \in R^T, q:R^d\rightarrow \{1,2,\cdots,T\} .
 ```
 
-Here ``$ w $`` is the vector of scores on leaves, ``$ q $`` is a function assigning each data point to the corresponding leaf and``$ T $`` is the number of leaves.
-In XGBoost, we define the complexity as
+这里 ``$ w $`` 是树叶上的分数向量，``$ q $`` 是将每个数据点分配给叶子的函数，``$ T $`` 是树叶的数量。
+在 XGBoost 中，我们将复杂度定义为
 
 ```math
 \Omega(f) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^T w_j^2
 ```
-Of course there is more than one way to define the complexity, but this specific one works well in practice. The regularization is one part most tree packages treat
-less carefully, or simply ignore. This was because the traditional treatment of tree learning only emphasized improving impurity, while the complexity control was left to heuristics.
-By defining it formally, we can get a better idea of what we are learning, and yes it works well in practice.
+当然有不止一种方法来定义复杂度，但是这个具体的方法在实践中运行良好。正则化是大多数树的包不那么谨慎或简单忽略的一部分。这是因为对传统的树学习算法的对待只强调提高 impurity（不纯性），而复杂度控制则是启发式的。
+通过正式定义，我们可以更好地了解我们正在学习什么，是的，它在实践中运行良好。
 
-### The Structure Score
+### The Structure Score（结构分数）
 
-Here is the magical part of the derivation. After reformalizing the tree model, we can write the objective value with the ``$ t$``-th tree as:
+这是 derivation（派生）的神奇部分。在对树模型进行重新格式化之后，我们可以用第 ``$ t$`` 棵树来编写目标值如 :
 
 ```math
 Obj^{(t)} &\approx \sum_{i=1}^n [g_i w_{q(x_i)} + \frac{1}{2} h_i w_{q(x_i)}^2] + \gamma T + \frac{1}{2}\lambda \sum_{j=1}^T w_j^2\\
 &= \sum^T_{j=1} [(\sum_{i\in I_j} g_i) w_j + \frac{1}{2} (\sum_{i\in I_j} h_i + \lambda) w_j^2 ] + \gamma T
 ```
 
-where ``$ I_j = \{i|q(x_i)=j\} $`` is the set of indices of data points assigned to the ``$ j $``-th leaf.
-Notice that in the second line we have changed the index of the summation because all the data points on the same leaf get the same score.
-We could further compress the expression by defining ``$ G_j = \sum_{i\in I_j} g_i $`` and ``$ H_j = \sum_{i\in I_j} h_i $``:
+其中 ``$ I_j = \{i|q(x_i)=j\} $`` 是分配给第 ``$ j $`` 个叶子的数据点的索引的集合。
+请注意，在第二行中，我们更改了总和的索引，因为同一叶上的所有数据点都得到了相同的分数。
+我们可以通过定义 ``$ G_j = \sum_{i\in I_j} g_i $`` 和 ``$ H_j = \sum_{i\in I_j} h_i $`` 来进一步压缩表达式 :
 
 ```math
 Obj^{(t)} = \sum^T_{j=1} [G_jw_j + \frac{1}{2} (H_j+\lambda) w_j^2] +\gamma T
 ```
 
-In this equation ``$ w_j $`` are independent to each other, the form ``$ G_jw_j+\frac{1}{2}(H_j+\lambda)w_j^2 $`` is quadratic and the best ``$ w_j $`` for a given structure ``$q(x)$`` and the best objective reduction we can get is:
+在这个等式中 ``$ w_j $`` 是相互独立的，形式 ``$ G_jw_j+\frac{1}{2}(H_j+\lambda)w_j^2 $`` 是二次的，对于给定的结构 ``$q(x)$`` 的最好的 ``$ w_j $``，我们可以得到最好的客观规约:
 
 ```math
 w_j^\ast = -\frac{G_j}{H_j+\lambda}\\
 Obj^\ast = -\frac{1}{2} \sum_{j=1}^T \frac{G_j^2}{H_j+\lambda} + \gamma T
 ```
-The last equation measures ***how good*** a tree structure ``$q(x)$`` is.
+最后一个方程度量一个树结构 ``$q(x)$`` ***how good（到底有多好）*** 。
 
 ![Structure Score](https://raw.githubusercontent.com/dmlc/web-data/master/xgboost/model/struct_score.png)
 
-If all this sounds a bit complicated, let's take a look at the picture, and see how the scores can be calculated.
-Basically, for a given tree structure, we push the statistics ``$g_i$`` and ``$h_i$`` to the leaves they belong to,
-sum the statistics together, and use the formula to calculate how good the tree is.
-This score is like the impurity measure in a decision tree, except that it also takes the model complexity into account.
+如果这一切听起来有些复杂，我们来看一下图片，看看分数是如何计算的。
+基本上，对于一个给定的树结构，我们把统计 ``$g_i$`` 和 ``$h_i$`` push 到它们所属的叶子上，统计数据加和到一起，然后使用公式计算树是多好。
+除了考虑到模型的复杂度，这个分数就像决策树中的杂质测量一样（例如，熵/GINI系数）。
 
-### Learn the tree structure
-Now that we have a way to measure how good a tree is, ideally we would enumerate all possible trees and pick the best one.
-In practice it is intractable, so we will try to optimize one level of the tree at a time.
-Specifically we try to split a leaf into two leaves, and the score it gains is
+### 学习树结构
+既然我们有了一个方法来衡量一棵树有多好，理想情况下我们会列举所有可能的树并挑选出最好的树。
+在实践中，这种方法是比较棘手的，所以我们会尽量一次优化树的一个层次。
+具体来说，我们试图将一片叶子分成两片，并得到分数
 
 ```math
 Gain = \frac{1}{2} \left[\frac{G_L^2}{H_L+\lambda}+\frac{G_R^2}{H_R+\lambda}-\frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\right] - \gamma
 ```
-This formula can be decomposed as 1) the score on the new left leaf 2) the score on the new right leaf 3) The score on the original leaf 4) regularization on the additional leaf.
-We can see an important fact here: if the gain is smaller than ``$\gamma$``, we would do better not to add that branch. This is exactly the ***pruning*** techniques in tree based
-models! By using the principles of supervised learning, we can naturally come up with the reason these techniques work :)
+这个公式可以分解为 1) 新左叶上的得分 2) 新右叶上的得分 3) 原始叶子上的得分 4) additional leaf（附加叶子）上的正则化。
+我们可以在这里看到一个重要的事实：如果增益小于 ``$\gamma$``，我们最好不要添加那个分支。这正是基于树模型的 ***pruning（剪枝）*** 技术！通过使用监督学习的原则，我们自然会想出这些技术工作的原因 :)
 
-For real valued data, we usually want to search for an optimal split. To efficiently do so, we place all the instances in sorted order, like the following picture.
+对于真实有价值的数据，我们通常要寻找一个最佳的分割。为了有效地做到这一点，我们把所有的实例按照排序顺序排列，如下图所示。
 ![Best split](https://raw.githubusercontent.com/dmlc/web-data/master/xgboost/model/split_find.png)
 
-Then a left to right scan is sufficient to calculate the structure score of all possible split solutions, and we can find the best split efficiently.
+然后从左到右的扫描就足以计算所有可能的拆分解决方案的结构得分，我们可以有效地找到最佳的拆分。
 
-Final words on XGBoost
+XGBoost 最后的话
 ----------------------
-Now that you understand what boosted trees are, you may ask, where is the introduction on [XGBoost](https://github.com/dmlc/xgboost)?
-XGBoost is exactly a tool motivated by the formal principle introduced in this tutorial!
-More importantly, it is developed with both deep consideration in terms of ***systems optimization*** and ***principles in machine learning***.
-The goal of this library is to push the extreme of the computation limits of machines to provide a ***scalable***, ***portable*** and ***accurate*** library.
-Make sure you [try it out](https://github.com/dmlc/xgboost), and most importantly, contribute your piece of wisdom (code, examples, tutorials) to the community!
+既然你明白了什么是 boosted trees 了，你可能会问这在 [XGBoost](https://github.com/dmlc/xgboost) 中的介绍在哪里？
+XGBoost 恰好是本教程中引入的正式原则的动力！
+更重要的是，在 ***systems optimization（系统优化）*** 和 ***principles in machine learning（机器学习原理）*** 方面都有深入的研究。
+这个库的目标是推动机器计算极限的极端，以提供一个 ***scalable（可扩展）***, ***portable（可移植）*** 和 ***accurate（精确的）*** 库。
+确保你 [试一试](https://github.com/dmlc/xgboost)，最重要的是，向社区贡献你的智慧（代码，例子，教程）！
