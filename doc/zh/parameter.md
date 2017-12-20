@@ -8,8 +8,6 @@ XGBoost 参数
 
 R 中的参数
 -----------------------
-In R-package, you can use .(dot) to replace under score in the parameters, for example, you can use max.depth as max_depth. The underscore parameters are also valid in R.
-
 在 R 包中. 您可以使用 .（点）替换参数中下划线, 例如, 可以使用 max.depth 作为 max_depth.
 下划线参数在 R 中也是有效的.
 
