@@ -1,16 +1,17 @@
 XGBoost 参数
 ==================
-Before running XGboost, we must set three types of parameters: general parameters, booster parameters and task parameters.
-- General parameters relates to which booster we are using to do boosting, commonly tree or linear model
-- Booster parameters depends on which booster you have chosen
-- Learning Task parameters that decides on the learning scenario, for example, regression tasks may use different parameters with ranking tasks.
-- Command line parameters that relates to behavior of CLI version of xgboost.
+在运行 XGBoost 之前, 我们必须设置三种类型的参数: 常规参数, 提升器参数和任务参数.
+- 常规参数与我们用于提升的提升器有关，通常是树模型或线性模型
+- 提升器参数取决于你所选择的提升器
+- 学习任务的参数决定了学习场景, 例如回归任务可以使用不同的参数进行排序相关的任务
+- 命令行参数的行为与 xgboost 的 CLI 版本相关
 
-R 软件包中的参数
+R 中的参数
 -----------------------
-In R-package, you can use .(dot) to replace under score in the parameters, for example, you can use max.depth as max_depth. The underscore parameters are also valid in R.
+在 R 包中. 您可以使用 .（点）替换参数中下划线, 例如, 可以使用 max.depth 作为 max_depth.
+下划线参数在 R 中也是有效的.
 
-普通参数
+常规参数
 ------------------
 * booster [default=gbtree]
   - which booster to use, can be gbtree, gblinear or dart. gbtree and dart use tree based model while gblinear uses linear function.
@@ -23,7 +24,7 @@ In R-package, you can use .(dot) to replace under score in the parameters, for e
 * num_feature [set automatically by xgboost, no need to be set by user]
   - feature dimension used in boosting, set to maximum dimension of the feature
 
-用于 Tree Booster 的参数
+用于 Tree 提升的参数
 ---------------------------
 * eta [default=0.3]
   - step size shrinkage used in update to prevents overfitting. After each boosting step, we can directly get the weights of new features. and eta actually shrinks the feature weights to make the boosting process more conservative.
