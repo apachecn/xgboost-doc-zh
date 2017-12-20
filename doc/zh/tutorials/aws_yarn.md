@@ -1,89 +1,83 @@
-Distributed XGBoost YARN on AWS
-===============================
-This is a step-by-step tutorial on how to setup and run distributed [XGBoost](https://github.com/dmlc/xgboost)
-on a AWS EC2 cluster. Distributed XGBoost runs on various platforms such as MPI, SGE and Hadoop YARN.
-In this tutorial, we use YARN as an example since this is widely used solution for distributed computing.
+AWS 上的分布式 XGBoost YARN
+=======================================
+这是关于如何在 AWS EC2 集群上设置和运行分布式 [XGBoost](https://github.com/dmlc/xgboost) 的分步教程。分布式 XGBoost 运行在各种平台上，如 MPI， SGE 和 Hadoop YARN 。
+在本教程中，我们使用 YARN 作为示例，因为这是分布式计算广泛使用的解决方案。
 
-Prerequisite
-------------
-We need to get a [AWS key-pair](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html)
-to access the AWS services. Let us assume that we are using a key ```mykey``` and  the corresponding permission file ```mypem.pem```.
+准备条件
+----------------
+我们需要获得一个 [AWS key-pair（密钥对）](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) 来访问 AWS 服务。我们假设我们正在使用一个 ```mykey``` 的 key（键）和相应的权限文件 ```mypem.pem``` 。
 
-We also need [AWS credentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html),
-which includes an `ACCESS_KEY_ID` and a `SECRET_ACCESS_KEY`.
+我们还需要 [AWS credentials](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html)，其中包括 `ACCESS_KEY_ID` 和 `SECRET_ACCESS_KEY` 。
 
-Finally, we will need a S3 bucket to host the data and the model, ```s3://mybucket/```
+最后，我们需要一个 S3 bucket（桶）来托管数据和模型，
+```s3://mybucket/```
 
-Setup a Hadoop YARN Cluster
+设置 Hadoop YARN 集群
 ---------------------------
-This sections shows how to start a Hadoop YARN cluster from scratch.
-You can skip this step if you have already have one.
-We will be using [yarn-ec2](https://github.com/tqchen/yarn-ec2) to start the cluster.
+本节将介绍如何从头开始部署 Hadoop YARN 集群。
+如果你已经有一个部署好的 Hadoop YARN 集群，那么你可以直接跳过这一步。
+我们将使用 [yarn-ec2](https://github.com/tqchen/yarn-ec2) 来启动集群。
 
-We can first clone the yarn-ec2 script by the following command.
+我们可以先使用下面的命令来 clone yarn-ec2 脚本
 ```bash
 git clone https://github.com/tqchen/yarn-ec2
 ```
 
-To use the script, we must set the environment variables `AWS_ACCESS_KEY_ID` and
-`AWS_SECRET_ACCESS_KEY` properly. This can be done by adding the following two lines in
-`~/.bashrc` (replacing the strings with the correct ones)
+要使用该脚本，我们必须将环境变量 `AWS_ACCESS_KEY_ID` 和 `AWS_SECRET_ACCESS_KEY` 设置正确。这可以通过在 `~/.bashrc` 中添加以下两行来完成（用正确的替换字符串）
 
 ```bash
 export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
 
-Now we can launch a master machine of the cluster from EC2
+现在我们可以从 EC2 启动集群的 master 了
 ```bash
 ./yarn-ec2 -k mykey -i mypem.pem launch xgboost
 ```
-Wait a few mininutes till the master machine get up.
+等待几分钟，直到 master 启动完成。
 
-After the master machine gets up, we can query the public DNS of the master machine using the following command.
+master 机器启动之后，可以使用以下命令查询 master 机器的公共 DNS 。
 ```bash
 ./yarn-ec2 -k mykey -i mypem.pem get-master xgboost
 ```
-It will show the public DNS of the master machine like ```ec2-xx-xx-xx.us-west-2.compute.amazonaws.com```
-Now we can open the browser, and type(replace the DNS with the master DNS)
+它会显示 master 机器的公共 DNS 就像下面这样 ```ec2-xx-xx-xx.us-west-2.compute.amazonaws.com```
+现在我们可以打开浏览器，输入（用 master DNS 替换 DNS）
 ```
 ec2-xx-xx-xx.us-west-2.compute.amazonaws.com:8088
 ```
-This will show the job tracker of the YARN cluster. Note that we may wait a few minutes before the master finishes bootstraping and starts the
-job tracker.
+这将显示 YARN 集群的 job tracker 。需要注意的是，在 master 完成引导和启动 job tracker 之前我们可能需要等待几分钟。
 
-After master machine gets up, we can freely add more slave machines to the cluster.
-The following command add m3.xlarge instances to the cluster.
+在 master 机器启动后，我们可以自由添加更多的 slave 机器到集群中。
+以下的命令将 m3.xlarge 实例添加到集群中了。
 ```bash
 ./yarn-ec2 -k mykey -i mypem.pem -t m3.xlarge -s 2 addslave xgboost
 ```
-We can also choose to add two spot instances
+我们也可以选择添加两个 spot 实例
 ```bash
 ./yarn-ec2 -k mykey -i mypem.pem -t m3.xlarge -s 2 addspot xgboost
 ```
-The slave machines will startup, bootstrap  and report to the master.
-You can check if the slave machines are connected by clicking on Nodes link on the job tracker.
-Or simply type the following URL(replace DNS ith the master DNS)
+slave 机器将启动，引导并向 master 报告。
+你可以单击 job tracker 上的 Nodes 链接来检查 slave 机器是否已连接。
+或者只需输入以下 URL（将 DNS 替换为 master DNS）
 ```
 ec2-xx-xx-xx.us-west-2.compute.amazonaws.com:8088/cluster/nodes
 ```
 
-One thing we should note is that not all the links in the job tracker works.
-This is due to that many of them uses the private ip of AWS, which can only be accessed by EC2.
-We can use ssh proxy to access these packages.
-Now that we have setup a cluster with one master and two slaves. We are ready to run the experiment.
+我们需要注意的一件事情是，并不是 job tracker 中的所有的链接都会起作用。
+这是由于它们中的许多使用 AWS 的私有 IP，只能由 EC2 访问。
+我们可以使用 ssh 代理来访问这些包。
+现在我们已经建立了一个 master 和两个 slaves 的集群。我们准备好运行这个实验。
 
 
-Build XGBoost with S3
----------------------
-We can log into the master machine by the following command.
+使用 S3 构建 XGBoost
+---------------------------
+我们可以通过以下命令登录到 master 服务器上。
 ```bash
 ./yarn-ec2 -k mykey -i mypem.pem login xgboost
 ```
 
-We will be using S3 to host the data and the result model, so the data won't get lost after the cluster shutdown.
-To do so, we will need to build xgboost with S3 support. The only thing we need to do is to set ```USE_S3```
-variable to be true. This can be achieved by the following command.
+我们将使用 S3 来托管数据和结果模型，因此在集群关闭后数据不会丢失。
+要做到这一点，我们需要构建 S3 支持的 xgboost 。我们唯一需要做的就是设置 ```USE_S3``` 变量为 true 。这可以通过以下的命令来实现。
 
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
@@ -92,10 +86,9 @@ cp make/config.mk config.mk
 echo "USE_S3=1" >> config.mk
 make -j4
 ```
-Now we have built the XGBoost with S3 support. You can also enable HDFS support if you plan to store data on HDFS, by turnning on ```USE_HDFS``` option.
+现在我们已经构建了 S3 支持的 XGBoost 。如果您打算在 HDFS 上存储数据，您也可以启用 HDFS 支持，只需要打开 ```USE_HDFS``` 就可以了。
 
-XGBoost also relies on the environment variable to access S3, so you will need to add the following two lines to `~/.bashrc` (replacing the strings with the correct ones)
-on the master machine as well.
+XGBoost 也依赖环境变量来访问 S3，所以你需要在 `~/.bashrc` 中添加以下两行（用正确的字符串替换）在 master 机器上也是如此。
 
 ```bash
 export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
@@ -103,11 +96,11 @@ export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 export BUCKET=mybucket
 ```
 
-Host the Data on S3
+在 S3 上托管数据
 -------------------
-In this example, we will copy the example dataset in xgboost to the S3 bucket as input.
-In normal usecases, the dataset is usually created from existing distributed processing pipeline.
-We can use [s3cmd](http://s3tools.org/s3cmd) to copy the data into mybucket(replace ${BUCKET} with the real bucket name).
+在这个例子中，我们将把 xgboost 中的示例数据集复制到 S3 bucket（存储桶）中作为输入。
+在正常使用情况下，数据集通常是从 existing distributed processing pipeline （现有的分布式处理 pipeline）创建的。
+我们可以使用 [s3cmd](http://s3tools.org/s3cmd) 将数据复制到 mybucket(用真实的 bucket 名称替换 ${BUCKET}) 。
 
 ```bash
 cd xgboost
@@ -115,12 +108,12 @@ s3cmd put demo/data/agaricus.txt.train s3://${BUCKET}/xgb-demo/train/
 s3cmd put demo/data/agaricus.txt.test s3://${BUCKET}/xgb-demo/test/
 ```
 
-Submit the Jobs
----------------
-Now everything is ready, we can submit the xgboost distributed job to the YARN cluster.
-We will use the [dmlc-submit](https://github.com/dmlc/dmlc-core/tree/master/tracker) script to submit the job.
+提交作业
+-------------------
+现在一切准备就绪，我们可以将 xgboost 分布式作业提交到 YARN 集群了。
+我们将使用 [dmlc-submit](https://github.com/dmlc/dmlc-core/tree/master/tracker) 脚本来提交作业。
 
-Now we can run the following script in the distributed training folder(replace ${BUCKET} with the real bucket name)
+现在我们可以在 distributed training folder（分布式训练文件夹）(用真实的 bucket 名称替换 ${BUCKET}) 中运行以下脚本。
 ```bash
 cd xgboost/demo/distributed-training
 # Use dmlc-submit to submit the job.
@@ -130,19 +123,19 @@ cd xgboost/demo/distributed-training
     eval[test]=s3://${BUCKET}/xgb-demo/test\
     model_dir=s3://${BUCKET}/xgb-demo/model
 ```
-All the configurations such as ```data``` and ```model_dir``` can also be directly written into the configuration file.
-Note that we only specified the folder path to the file, instead of the file name.
-XGBoost will read in all the files in that folder as the training and evaluation data.
+所有配置如 ```data``` 和 ```model_dir``` 也可以直接写入配置文件。
+请注意，我们只指定文件的文件夹路径，而不是文件名。
+XGBoost 将读取该文件夹下的所有文件作为训练和评估数据。
 
-In this command, we are using two workers, each worker uses two running thread.
-XGBoost can benefit from using multiple cores in each worker.
-A common choice of working cores can range from 4 to 8.
-The trained model will be saved into the specified model folder. You can browse the model folder.
+在这个命令中，我们使用了 2 个 workers，每个 worker 使用两个正在运行的线程。
+XGBoost 可以从每个 worker 使用多个 cores 中受益。
+工作 cores 的常见的选择范围从 4 到 8 。
+训练好的模型将被保存到指定的模型文件夹中。您可以浏览模型文件夹。
 ```
 s3cmd ls s3://${BUCKET}/xgb-demo/model/
 ```
 
-The following is an example output from distributed training.
+以下是分布式训练的输出示例。
 ```
 16/02/26 05:41:59 INFO dmlc.Client: jobname=DMLC[nworker=2]:xgboost,username=ubuntu
 16/02/26 05:41:59 INFO dmlc.Client: Submitting application application_1456461717456_0015
@@ -155,33 +148,28 @@ The following is an example output from distributed training.
 Application application_1456461717456_0015 finished with state FINISHED at 1456465335961
 ```
 
-Analyze the Model
+分析模型
 -----------------
-After the model is trained, we can analyse the learnt model and use it for future prediction task.
-XGBoost is a portable framework, the model in all platforms are ***exchangable***.
-This means we can load the trained model in python/R/Julia and take benefit of data science pipelines
-in these languages to do model analysis and prediction.
+模型训练后，我们可以分析学习的模型，并将其用于未来的预测任务。
+XGBoost 是一个可移植的框架，所有平台的模型都是 ***exchangable(可交换)*** 。
+这意味着我们可以在 python/R/Julia 中加载训练好的模型，并利用这些语言中的 data science pipelines （数据科学 pipeline）来做模型分析和预测。
 
-For example, you can use [this ipython notebook](https://github.com/dmlc/xgboost/tree/master/demo/distributed-training/plot_model.ipynb)
-to plot feature importance and visualize the learnt model.
+例如，你可以使用 [这个 ipython notebook](https://github.com/dmlc/xgboost/tree/master/demo/distributed-training/plot_model.ipynb) 来绘制 feature importance （特征重要性）和可视化的学习模型。
 
-Trouble Shooting
+故障排除
 ----------------
 
-When you encountered a problem, the best way might be use the following command
-to get logs of stdout and stderr of the containers, to check what causes the problem.
+遇到问题的时候，最好的方法可能是使用以下命令获取容器的 stdout 和 stderr 的日志，以检查导致问题的原因。
 ```
 yarn logs -applicationId yourAppId
 ```
 
-Future Directions
------------------
-You have learnt to use distributed XGBoost on YARN in this tutorial.
-XGBoost is portable and scalable framework for gradient boosting.
-You can checkout more examples and resources in the [resources page](https://github.com/dmlc/xgboost/blob/master/demo/README.md).
+未来发展方向
+-----------------------
+在本教程中，您已经学会了在 YARN 上使用分布式 XGBoost 。
+XGBoost 是用于渐变增强的可移植和可伸缩框架。
+您可以在 [资源页面](https://github.com/dmlc/xgboost/blob/master/demo/README.md) 中查看更多的示例和资源。
 
-The project goal is to make the best scalable machine learning solution available to all platforms.
-The API is designed to be able to portable, and the same code can also run on other platforms such as MPI and SGE.
-XGBoost is actively evolving and we are working on even more exciting features
-such as distributed xgboost python/R package. Checkout [RoadMap](https://github.com/dmlc/xgboost/issues/873) for
-more details and you are more than welcomed to contribute to the project.
+该项目的目标是为所有平台提供最佳的可扩展机器学习解决方案。
+API 被设计为可移植的，相同的代码也可以在其他平台上运行，例如 MPI 和 SGE 。
+XGBoost 正在积极发展，我们正在开发更多令人兴奋的功能，如分布式 xgboost python/R 包。查看 [路线图](https://github.com/dmlc/xgboost/issues/873) 来了解更多的细节并且欢迎你为这个项目你做出贡献。
