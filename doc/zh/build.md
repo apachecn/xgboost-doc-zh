@@ -8,7 +8,8 @@
    - Exception: 针对 R 软件包的安装请直接参考 R 软件包的部分.
 2. 然后, 安装相关的编程语言软件包（例如. Python 软件包）.
 
-***Important*** 最新版本的 xgboost 使用子模块来维护软件包, 所以当你 clone repo 时, 记得按如下方式使用递归选项.
+***重要提示*** 最新版本的 xgboost 使用子模块来维护软件包, 所以当你 clone repo 时, 记得按如下方式使用递归选项.
+
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
 ```
@@ -24,14 +25,14 @@ git submodule update
 或者如果你能解决该问题, 最好发起一个 pull request.
 
 ## 页面内容目录
-- [构建共享库](#构建共享库)
-  - [在 Ubuntu/Debian 上构建](#在 Ubuntu/Debian 上构建)
-  - [在 OSX 上构建](#在 OSX 上构建)
-  - [在 Windows 上构建](#在 Windows 上构建)
-  - [自定义构建](#自定义构建)
-- [Python 软件包安装](#Python 软件包安装)
-- [R 软件包安装](#R 软件包安装)
-- [故障排查](#故障排查)
+- [构建共享库](#id3)
+  - [在 Ubuntu/Debian 上构建](#ubuntu-debian)
+  - [在 OSX 上构建](#OSX)
+  - [在 Windows 上构建](#windows)
+  - [自定义构建](#id4)
+- [Python 软件包安装](#Python)
+- [R 软件包安装](#R)
+- [故障排查](#id5)
 
 ## 构建共享库
 
