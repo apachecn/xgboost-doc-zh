@@ -4,8 +4,8 @@
 
 ## Links to Helpful Other Resources
 - 请参阅 [安装指南](../build.md) 以了解如何去安装 xgboost.
-- 请参阅 [指引页面](../how_to/index.md) 以了解有关使用 xgboost 的各种技巧.
-- 请参阅 [教程页面](../tutorials/index.md) 以了解有关特定任务的教程.
+- 请参阅 [入门指引](../how_to/index.md) 以了解有关使用 xgboost 的各种技巧.
+- 请参阅 [学习教程](../tutorials/index.md) 以了解有关特定任务的教程.
 - 请参阅 [通过例子来学习使用 XGBoost](../../demo) 以了解更多代码示例.
 
 ## Python
