@@ -20,18 +20,18 @@ git submodule init
 git submodule update
 ```
 
-如果你在安装期间有任何问题, 请首先参考 [故障排除部分](#trouble-shooting).
-如果其中的说明不适合你, 请放心的到 [xgboost/issues](https://github.com/dmlc/xgboost/issues) 上提问题,
+如果你在安装期间有任何问题, 请首先参考 [故障排除部分](#id5).
+如果其中的说明不适合你, 请放心的到 [xgboost-doc-zh/issues](https://github.com/apachecn/xgboost-doc-zh/issues) 上提问题,
 或者如果你能解决该问题, 最好发起一个 pull request.
 
 ## 页面内容目录
 - [构建共享库](#id3)
   - [在 Ubuntu/Debian 上构建](#ubuntu-debian)
-  - [在 OSX 上构建](#OSX)
+  - [在 OSX 上构建](#osx)
   - [在 Windows 上构建](#windows)
   - [自定义构建](#id4)
-- [Python 软件包安装](#Python)
-- [R 软件包安装](#R)
+- [Python 软件包安装](#python)
+- [R 软件包安装](#r)
 - [故障排查](#id5)
 
 ## 构建共享库
