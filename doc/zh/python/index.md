@@ -6,5 +6,5 @@ XGBoost Python Package
 内容目录
 --------
 * [Python 教程概述](python_intro.md)
-* [通过例子来学习 XGBoost](../../demo)
+* [通过例子来学习 XGBoost](https://github.com/apachecn/xgboost-doc-zh/tree/v0.60/demo/zh)
 * [Python API 参考](python_api.rst)
