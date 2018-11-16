@@ -4,7 +4,7 @@ python: 3.6
 install:
   - pip install -r doc/zh/requirements.txt -q
   - git clone https://github.com/tqchen/recommonmark
-  - mv -r recommonmark/recommonmark doc/zh/recommonmark
+  - mv recommonmark/recommonmark doc/zh/recommonmark
 
 script:
   - cd doc/zh/
