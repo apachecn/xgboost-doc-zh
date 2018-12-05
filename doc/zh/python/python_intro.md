@@ -147,7 +147,7 @@ bst.load_model("model.bin") # load data
 # 7 个样本, 每一个包含 10 个特征
 data = np.random.rand(7, 10)
 dtest = xgb.DMatrix(data)
-ypred = bst.predict(xgmat)
+ypred = bst.predict(dtest)
 ```
 
 如果在训练过程中提前停止, 可以用 `bst.best_ntree_limit` 从最佳迭代中获得预测结果:
