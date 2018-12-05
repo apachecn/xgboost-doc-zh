@@ -132,7 +132,7 @@ After you training/loading a model and preparing the data, you can start to do p
 # 7 entities, each contains 10 features
 data = np.random.rand(7, 10)
 dtest = xgb.DMatrix(data)
-ypred = bst.predict(xgmat)
+ypred = bst.predict(dtest)
 ```
 
 If early stopping is enabled during training, you can get predicticions from the best iteration with `bst.best_ntree_limit`:
