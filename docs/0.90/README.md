@@ -37,13 +37,6 @@
 
 格式: GitHub + QQ
 
-> 第一期 (2017-xx-xx)
-
-* [那伊抹微笑](https://github.com/wangyangting): 1042658081
-* [Peppa](https://github.com/chenyyx): 190442212
-
-> 第2期 (2019-07-07)
-
 * [1266](https://github.com/wangweitong): 1097828409
 * [腻味](https://github.com/xxxx): 1185685810
 
