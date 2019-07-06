@@ -4,10 +4,7 @@
 
 > 它在 [Gradient Boosting](https://en.wikipedia.org/wiki/Gradient_boosting) 框架下实现机器学习算法。XGBoost提供并行树提升（也称为GBDT，GBM），可以快速准确地解决许多数据科学问题。相同的代码在主要的分布式环境（Hadoop，SGE，MPI）上运行，并且可以解决数十亿个示例之外的问题。
 
-<center>
-
 ![](docs/img/logo.png)
-</center>
 
 > 欢迎任何人参与和完善：一个人可以走的很快，但是一群人却可以走的更远。
 
