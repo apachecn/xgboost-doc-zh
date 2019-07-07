@@ -42,7 +42,7 @@
 > 第2期 (2019-07-07)
 
 * [1266](https://github.com/wangweitong): 1097828409
-* [腻味](https://github.com/xxxx): 1185685810
+* [腻味](https://github.com/XuQiao318): 1185685810
 
 -- 负责人要求: (欢迎一起为 `XGBoost 中文版本` 做贡献)
 
