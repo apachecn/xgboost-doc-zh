@@ -1,17 +1,17 @@
 # <center>XGBoost 中文文档</center>
 
-<center>XGBoost是一个优化的分布式梯度增强库，旨在实现高效，灵活和便携。</center>
-
-> 它在 [Gradient Boosting](https://en.wikipedia.org/wiki/Gradient_boosting) 框架下实现机器学习算法。XGBoost提供并行树提升（也称为GBDT，GBM），可以快速准确地解决许多数据科学问题。相同的代码在主要的分布式环境（Hadoop，SGE，MPI）上运行，并且可以解决数十亿个示例之外的问题。
-
 ![](docs/img/logo.png)
+
+XGBoost是一个优化的分布式梯度增强库，旨在实现高效，灵活和便携。
+
+它在 [Gradient Boosting](https://en.wikipedia.org/wiki/Gradient_boosting) 框架下实现机器学习算法。XGBoost提供并行树提升（也称为GBDT，GBM），可以快速准确地解决许多数据科学问题。相同的代码在主要的分布式环境（Hadoop，SGE，MPI）上运行，并且可以解决数十亿个示例之外的问题。
 
 > 欢迎任何人参与和完善：一个人可以走的很快，但是一群人却可以走的更远。
 
 * [中文地址](https://xgboost.apachecn.org/)
 * [英文地址](https://xgboost.ai/)
-+ [ApacheCN 机器学习交流群 629470233](http://shang.qq.com/wpa/qunwpa?idkey=30e5f1123a79867570f665aa3a483ca404b1c3f77737bc01ec520ed5f078ddef)
-+ [ApacheCN 学习资源](https://www.ibooker.org.cn/docs)
+* [ApacheCN 机器学习交流群 629470233](http://shang.qq.com/wpa/qunwpa?idkey=30e5f1123a79867570f665aa3a483ca404b1c3f77737bc01ec520ed5f078ddef)
+* [ApacheCN 学习资源](https://www.ibooker.org.cn/docs)
 
 ## 翻译进度
 
