@@ -59,6 +59,16 @@ XGBoost是一个优化的分布式梯度增强库，旨在实现高效，灵活�
 * 发邮件到 Email: `apachecn@163.com`.
 * 在我们的 [QQ群-搜索: 交流方式](https://github.com/apachecn/home) 中联系群主/管理员即可.
 
+## 下载
+
+### NPM
+
+```
+npm install -g xgboost-doc-zh
+xgboost-doc-zh <port>
+# 访问 http://localhost:{port} 查看文档
+```
+
 ## 赞助我们
 
 <img src="http://data.apachecn.org/img/about/donate.jpg" alt="微信&支付宝" />
