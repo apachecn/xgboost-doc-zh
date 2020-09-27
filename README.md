@@ -61,6 +61,14 @@ XGBoost是一个优化的分布式梯度增强库，旨在实现高效，灵活�
 
 ## 下载
 
+### PYPI
+
+```
+pip install xgboost-doc-zh
+xgboost-doc-zh <port>
+# 访问 http://localhost:{port} 查看文档
+```
+
 ### NPM
 
 ```
